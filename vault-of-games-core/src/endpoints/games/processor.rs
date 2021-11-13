@@ -18,7 +18,15 @@ impl Processor {
         Json(payload): Json<CreateGame>,
         Extension(database): Extension<Database>,
     ) -> impl IntoResponse {
-        let game = Game::new(Uuid::new_v4(), payload.title);
+        let game = Game::new(
+            Uuid::new_v4(),
+            payload.title,
+            payload.image_url,
+            payload.status,
+            payload.rating,
+            payload.categories,
+            payload.note,
+        );
 
         database.write().unwrap().insert(game.id, game.clone());
 
@@ -59,7 +67,7 @@ impl Processor {
             .cloned()
             .ok_or(StatusCode::NOT_FOUND)?;
 
-        game.title = payload.title;
+        game.update(payload);
 
         database
             .write()
