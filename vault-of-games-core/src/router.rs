@@ -10,6 +10,8 @@ impl MountEndpointsExt for Router {
     fn mount_endpoints(self) -> Self {
         let games = GamesEndpoint::connect_router();
 
-        self.merge(games)
+        let v1 = Router::new().nest("/v1", games);
+
+        self.merge(v1)
     }
 }
