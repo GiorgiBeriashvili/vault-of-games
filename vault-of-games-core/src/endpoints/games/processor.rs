@@ -10,13 +10,8 @@ use crate::server::Database;
 
 use super::entities::{CreateGame, Game, UpdateGame};
 
+#[derive(Default)]
 pub struct Processor;
-
-impl Default for Processor {
-    fn default() -> Self {
-        Self {}
-    }
-}
 
 impl Processor {
     pub async fn create(
