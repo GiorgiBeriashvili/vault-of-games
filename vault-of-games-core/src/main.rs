@@ -1,18 +1,20 @@
+use anyhow::Result;
+use dotenv::dotenv;
+
+mod authentication;
+mod database;
 mod endpoints;
+mod processor;
 mod router;
 mod server;
 
-use server::Server;
-
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    if std::env::var_os("RUST_LOG").is_none() {
-        std::env::set_var("RUST_LOG", "vault_of_games_core=debug,tower_http=debug")
-    }
+async fn main() -> Result<()> {
+    dotenv()?;
 
     tracing_subscriber::fmt::init();
 
-    Server::run().await?;
+    server::run().await?;
 
     Ok(())
 }

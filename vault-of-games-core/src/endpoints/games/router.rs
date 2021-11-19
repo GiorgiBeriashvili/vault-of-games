@@ -1,20 +1,26 @@
 use axum::{routing::get, Router};
+use tower_http::auth::AsyncRequireAuthorizationLayer;
 
-use crate::endpoints::Endpoint;
+use crate::{authentication::middleware::JWTAuthorizationLayer, endpoints::Endpoint};
 
-use super::{processor::Processor, GamesEndpoint};
+use super::{processor::GamesProcessor, GamesEndpoint};
 
 impl Endpoint for GamesEndpoint {
     fn connect_router() -> Router {
         let routes = Router::new()
-            .route("/", get(Processor::read_all).post(Processor::create))
+            .route(
+                "/",
+                get(GamesProcessor::read_all).post(GamesProcessor::create),
+            )
             .route(
                 "/:id",
-                get(Processor::read)
-                    .patch(Processor::update)
-                    .delete(Processor::delete),
+                get(GamesProcessor::read)
+                    .patch(GamesProcessor::update)
+                    .delete(GamesProcessor::delete),
             );
 
-        Router::new().nest("/games", routes)
+        Router::new()
+            .nest("/games", routes)
+            .layer(AsyncRequireAuthorizationLayer::new(JWTAuthorizationLayer))
     }
 }

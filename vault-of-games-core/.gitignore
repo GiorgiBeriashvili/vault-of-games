@@ -15,3 +15,9 @@ Cargo.lock
 
 # Source code editor related
 .idea/
+
+# Environment file
+.env
+
+# Secret keys
+*.key

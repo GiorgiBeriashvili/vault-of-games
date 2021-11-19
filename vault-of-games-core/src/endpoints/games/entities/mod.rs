@@ -1,5 +1,10 @@
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
+use self::payloads::Update;
+
+pub mod payloads;
 
 #[derive(Clone, Copy, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -19,6 +24,8 @@ pub struct Game {
     pub rating: Option<u8>,
     pub categories: Option<Vec<String>>,
     pub note: Option<String>,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl Game {
@@ -30,6 +37,8 @@ impl Game {
         rating: Option<u8>,
         categories: Option<Vec<String>>,
         note: Option<String>,
+        created_at: String,
+        updated_at: Option<String>,
     ) -> Self {
         Self {
             id,
@@ -39,10 +48,12 @@ impl Game {
             rating,
             categories,
             note,
+            created_at,
+            updated_at,
         }
     }
 
-    pub fn update(&mut self, payload: UpdateGame) {
+    pub fn update(&mut self, payload: Update) {
         self.title = payload.title;
 
         if let Some(image_url) = payload.image_url {
@@ -64,25 +75,7 @@ impl Game {
         if let Some(note) = payload.note {
             self.note = note.into();
         }
+
+        self.updated_at = Some(Utc::now().to_string());
     }
-}
-
-#[derive(Deserialize)]
-pub struct CreateGame {
-    pub title: String,
-    pub image_url: Option<String>,
-    pub status: Option<Status>,
-    pub rating: Option<u8>,
-    pub categories: Option<Vec<String>>,
-    pub note: Option<String>,
-}
-
-#[derive(Deserialize)]
-pub struct UpdateGame {
-    pub title: String,
-    pub image_url: Option<String>,
-    pub status: Option<Status>,
-    pub rating: Option<u8>,
-    pub categories: Option<Vec<String>>,
-    pub note: Option<String>,
 }
