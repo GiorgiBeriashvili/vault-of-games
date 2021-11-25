@@ -6,15 +6,12 @@ use axum::{
 };
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
-use uuid::Uuid;
 
-use crate::{
-    database::Database,
-    endpoints::{games::entities::Game, users::entities::User},
-    router::MountEndpointsExt,
-};
+use crate::{database::DatabaseConnectionPool, router::MountEndpointsExt};
 
 pub async fn run() -> Result<()> {
+    let pool = DatabaseConnectionPool::connect(&std::env::var("DATABASE_URL")?).await?;
+
     let middleware = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(|error: BoxError| {
             if error.is::<tower::timeout::error::Elapsed>() {
@@ -28,8 +25,7 @@ pub async fn run() -> Result<()> {
         }))
         .timeout(Duration::from_secs(10))
         .layer(TraceLayer::new_for_http())
-        .layer(AddExtensionLayer::new(Database::<Uuid, Game>::default()))
-        .layer(AddExtensionLayer::new(Database::<Uuid, User>::default()))
+        .layer(AddExtensionLayer::new(pool))
         .into_inner();
 
     let router = Router::new().mount_endpoints().layer(middleware);

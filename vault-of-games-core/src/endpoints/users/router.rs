@@ -11,7 +11,7 @@ impl Endpoint for UsersEndpoint {
     fn connect_router() -> Router {
         let routes = Router::new()
             .route(
-                "/",
+                "/:id",
                 get(UsersProcessor::read)
                     .patch(UsersProcessor::update)
                     .delete(UsersProcessor::delete),

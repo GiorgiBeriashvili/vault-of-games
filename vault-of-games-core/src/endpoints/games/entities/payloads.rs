@@ -3,7 +3,7 @@ use serde::Deserialize;
 use super::Status;
 
 #[derive(Deserialize)]
-pub struct Create {
+pub struct GameCreatePayload {
     pub title: String,
     pub image_url: Option<String>,
     pub status: Option<Status>,
@@ -13,7 +13,7 @@ pub struct Create {
 }
 
 #[derive(Deserialize)]
-pub struct Update {
+pub struct GameUpdatePayload {
     pub title: String,
     pub image_url: Option<String>,
     pub status: Option<Status>,

@@ -1,13 +1,10 @@
 pub mod payloads;
 
 use serde::Serialize;
-use uuid::Uuid;
 
-use self::payloads::Update;
-
-#[derive(Clone, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct User {
-    pub id: Uuid,
+    pub id: String,
     pub username: String,
     pub password: String,
     pub created_at: String,
@@ -16,7 +13,7 @@ pub struct User {
 
 impl User {
     pub fn new(
-        id: Uuid,
+        id: String,
         username: String,
         password: String,
         created_at: String,
@@ -29,9 +26,5 @@ impl User {
             created_at,
             updated_at,
         }
-    }
-
-    pub fn update(&mut self, payload: Update) {
-        self.password = payload.password;
     }
 }

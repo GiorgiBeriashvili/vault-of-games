@@ -1,13 +1,17 @@
 use axum::{
-    body::{box_body, Body, BoxBody},
+    body::{boxed, Body, BoxBody},
     http::Response,
 };
 use futures::future::BoxFuture;
-use hyper::{header::AUTHORIZATION, Request, StatusCode};
+use hyper::{
+    header::{AUTHORIZATION, CONTENT_TYPE},
+    Request, StatusCode,
+};
 use jwt_simple::{
     prelude::{EdDSAPublicKeyLike, JWTClaims, NoCustomClaims},
     reexports::coarsetime::Duration,
 };
+use serde_json::json;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tower_http::auth::AsyncAuthorizeRequest;
 
@@ -56,7 +60,10 @@ impl AsyncAuthorizeRequest for JWTAuthorizationLayer {
     fn unauthorized_response<B>(&mut self, _request: &Request<B>) -> Response<BoxBody> {
         Response::builder()
             .status(StatusCode::UNAUTHORIZED)
-            .body(box_body(Body::empty()))
+            .header(CONTENT_TYPE, "application/json")
+            .body(boxed(Body::from(
+                json!({ "message": "Please provide a valid Bearer token in Authorization header." }).to_string(),
+            )))
             .unwrap()
     }
 }

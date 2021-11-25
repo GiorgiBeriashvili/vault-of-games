@@ -4,19 +4,25 @@ use serde::Serialize;
 use serde_json::json;
 use thiserror::Error;
 
+use crate::error::MapToStatusCode;
+
 #[derive(Error, Debug, Serialize)]
 pub enum AuthenticationError {
-    #[error("Wrong credentials")]
+    #[error("wrong credentials")]
     WrongCredentials,
-    #[error("Missing credentials")]
+    #[error("missing credentials")]
     MissingCredentials,
-    #[error("Access token creation failed")]
+    #[error("access token creation failed")]
     TokenCreation,
 }
 
-impl From<jwt_simple::Error> for AuthenticationError {
-    fn from(_: jwt_simple::Error) -> Self {
-        Self::TokenCreation
+impl MapToStatusCode for AuthenticationError {
+    fn map_to_status_code(&self) -> StatusCode {
+        match self {
+            AuthenticationError::WrongCredentials => StatusCode::UNAUTHORIZED,
+            AuthenticationError::MissingCredentials => StatusCode::BAD_REQUEST,
+            AuthenticationError::TokenCreation => StatusCode::INTERNAL_SERVER_ERROR,
+        }
     }
 }
 
@@ -27,11 +33,7 @@ impl IntoResponse for AuthenticationError {
 
     fn into_response(self) -> Response<Self::Body> {
         let response = Response::builder()
-            .status(match self {
-                AuthenticationError::WrongCredentials => StatusCode::UNAUTHORIZED,
-                AuthenticationError::MissingCredentials => StatusCode::BAD_REQUEST,
-                AuthenticationError::TokenCreation => StatusCode::INTERNAL_SERVER_ERROR,
-            })
+            .status(self.map_to_status_code())
             .header(CONTENT_TYPE, "application/json")
             .body(Body::from(
                 json!({ "message": self.to_string() }).to_string(),

@@ -4,7 +4,7 @@ use dotenv::dotenv;
 mod authentication;
 mod database;
 mod endpoints;
-mod processor;
+mod error;
 mod router;
 mod server;
 

@@ -1,6 +1,3 @@
-use std::{
-    collections::HashMap,
-    sync::{Arc, RwLock},
-};
+use sqlx::SqlitePool;
 
-pub type Database<Key, Value> = Arc<RwLock<HashMap<Key, Value>>>;
+pub type DatabaseConnectionPool = SqlitePool;
